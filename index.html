@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TourismPro - Travel & Tourism System</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; color: #333; overflow-x: hidden; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+    .header { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.1); position: fixed; top: 0; left: 0; right: 0; z-index: 1000; }
+    .navbar { display: flex; justify-content: space-between; align-items: center; padding: 1rem 2rem; max-width: 1200px; margin: 0 auto; }
+    .nav-brand { display: flex; align-items: center; font-size: 1.5rem; font-weight: bold; color: #2563eb; }
+    .nav-brand i { margin-right: 0.5rem; font-size: 2rem; }
+    .btn-primary { padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; font-weight: 500; cursor: pointer; transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; background: #2563eb; color: white; }
+    .btn-primary:hover { background: #1d4ed8; }
+    .hero { position: relative; height: 100vh; display: flex; align-items: center; justify-content: center; color: white; text-align: center; }
+    .hero-background { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: -2; }
+    .hero-background img { width: 100%; height: 100%; object-fit: cover; }
+    .hero-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.4); z-index: -1; }
+    .hero-content { max-width: 800px; padding: 0 2rem; }
+    .hero-content h1 { font-size: 3.5rem; font-weight: bold; margin-bottom: 1rem; line-height: 1.2; }
+    .highlight { color: #60a5fa; }
+    .hero-content p { font-size: 1.25rem; margin-bottom: 2rem; opacity: 0.9; }
+    .search-form { background: white; padding: 2rem; border-radius: 1rem; box-shadow: 0 20px 60px rgba(0,0,0,0.1); margin-top: 2rem; }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .form-group { display: flex; flex-direction: column; }
+    .form-group label { color: #374151; font-weight: 500; margin-bottom: 0.5rem; }
+    .input-group { position: relative; display: flex; align-items: center; }
+    .input-group i { position: absolute; left: 1rem; color: #9ca3af; z-index: 1; }
+    .input-group input, .input-group select { width: 100%; padding: 0.75rem 1rem 0.75rem 2.5rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; transition: border-color 0.3s; }
+    .input-group input:focus, .input-group select:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .btn-search { width: 100%; padding: 1rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; font-size: 1.1rem; font-weight: 600; cursor: pointer; transition: background 0.3s; display: flex; align-items: center; justify-content: center; gap: 0.5rem; }
+    .btn-search:hover { background: #1d4ed8; }
+    .destination-card, .package-card { background: white; border-radius: 1rem; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: transform 0.3s; }
+    .destination-card:hover, .package-card:hover { transform: translateY(-5px); }
+    .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+    .modal.active { display: flex; }
+    .modal-content { background: white; margin: 2rem; padding: 0; border-radius: 1rem; max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 80px rgba(0,0,0,0.2); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #e5e7eb; }
+    .modal-header h2 { color: #111827; font-size: 1.5rem; font-weight: 600; }
+    .close { color: #6b7280; font-size: 2rem; font-weight: bold; cursor: pointer; transition: color 0.3s; background: none; border: none; }
+    .close:hover { color: #111827; }
+    .booking-progress { display: flex; align-items: center; justify-content: center; padding: 1.5rem; gap: 0.5rem; }
+    .progress-step { width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #e5e7eb; color: #6b7280; display: flex; align-items: center; justify-content: center; font-weight: 600; transition: all 0.3s; }
+    .progress-step.active { background: #2563eb; color: white; }
+    .progress-label { font-size: 0.875rem; color: #6b7280; margin-left: 0.5rem; }
+    .progress-line { width: 3rem; height: 2px; background: #e5e7eb; transition: background 0.3s; }
+    .progress-line.active { background: #2563eb; }
+    .booking-step { display: none; padding: 0 1.5rem 1.5rem; }
+    .booking-step.active { display: block; }
+    .booking-step h3 { color: #111827; font-size: 1.25rem; font-weight: 600; margin-bottom: 1.5rem; }
+    .trip-details-card { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem; }
+    .booking-summary { background: #dbeafe; border: 1px solid #93c5fd; padding: 1rem; border-radius: 0.5rem; margin-top: 1rem; }
+    .booking-summary h4 { color: #1e40af; font-weight: 600; margin-bottom: 0.75rem; }
+    .summary-item { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.875rem; color: #1e3a8a; }
+    .summary-item.total { border-top: 2px solid #93c5fd; padding-top: 0.75rem; margin-top: 0.5rem; font-weight: 700; font-size: 1.125rem; color: #1e40af; }
+    .note-box { background: #fef3c7; border: 1px solid #fbbf24; padding: 0.75rem; border-radius: 0.5rem; margin-top: 1rem; font-size: 0.875rem; color: #92400e; }
+    .modal-actions { display: flex; justify-content: space-between; padding: 1.5rem; border-top: 1px solid #e5e7eb; background: #f9fafb; border-radius: 0 0 1rem 1rem; }
+    .modal-actions button { padding: 0.75rem 1.5rem; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+    .btn-prev { background: #e5e7eb; color: #374151; }
+    .btn-prev:hover { background: #d1d5db; }
+    .btn-next { background: #2563eb; color: white; margin-left: auto; }
+    .btn-next:hover { background: #1d4ed8; }
+    .btn-submit { background: #10b981; color: white; }
+    .btn-submit:hover { background: #059669; }
+    textarea { width: 100%; padding: 0.75rem; border: 1px solid #d1d5db; border-radius: 0.5rem; font-size: 1rem; font-family: inherit; resize: vertical; transition: border-color 0.3s; }
+    textarea:focus { outline: none; border-color: #2563eb; box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+    .message-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 0.75rem; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 9999; max-width: 400px; width: 90%; border-top: 4px solid #2563eb; }
+    .message-box h4 { font-size: 1.25rem; font-weight: 700; color: #111827; margin-bottom: 0.75rem; }
+    .message-box p { color: #6b7280; margin-bottom: 1.5rem; line-height: 1.5; }
+    .message-box button { width: 100%; padding: 0.75rem; background: #2563eb; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+    .message-box button:hover { background: #1d4ed8; }
+    .footer { background: #111827; color: white; padding: 2rem 0 1rem; text-align: center; }
+    .footer p { color: #d1d5db; font-size: 0.875rem; }
+    @media (max-width: 768px) { .hero-content h1 { font-size: 2.5rem; } .form-row { grid-template-columns: 1fr; } .progress-label { display: none; } }
+  </style>
+</head>
+<body>
+  <header class="header">
+    <nav class="navbar">
+      <div class="nav-brand"><i class="fas fa-map-marker-alt"></i><span>TourismPro</span></div>
+      <button class="btn-primary" onclick="openBookingModal()"><i class="fas fa-calendar"></i> Book Now</button>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="hero-background">
+      <img src="https://images.unsplash.com/photo-1736524972348-85c310d7815b?w=1200" alt="Tropical Paradise" />
+      <div class="hero-overlay"></div>
+    </div>
+    <div class="hero-content">
+      <h1>Discover Your Next <span class="highlight">Adventure</span></h1>
+      <p>Explore the world's most beautiful destinations with our expertly crafted travel packages</p>
+      <div class="search-form">
+        <form id="heroBookingForm" onsubmit="handleHeroSubmit(event)">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Package</label>
+              <div class="input-group">
+                <i class="fas fa-suitcase-rolling"></i>
+                <select id="heroPackageId" required><option value="" disabled selected>Loading...</option></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Check-in</label>
+              <div class="input-group">
+                <i class="fas fa-calendar"></i>
+                <input type="date" id="heroCheckin" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Check-out</label>
+              <div class="input-group">
+                <i class="fas fa-calendar"></i>
+                <input type="date" id="heroCheckout" required />
+              </div>
+            </div>
+            <div class="form-group">
+              <label>Guests</label>
+              <div class="input-group">
+                <i class="fas fa-users"></i>
+                <select id="heroGuests">
+                  <option value="1">1 Guest</option>
+                  <option value="2" selected>2 Guests</option>
+                  <option value="3">3 Guests</option>
+                  <option value="4">4 Guests</option>
+                  <option value="5">5 Guests</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <button type="submit" class="btn-search"><i class="fas fa-calendar-check"></i> Start Booking</button>
+        </form>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding: 4rem 0; background: white;">
+    <div class="container">
+      <div style="text-align: center; margin-bottom: 3rem;">
+        <h2 style="font-size: 2.5rem; font-weight: bold; color: #111827; margin-bottom: 1rem;">Featured Destinations</h2>
+        <p style="font-size: 1.25rem; color: #6b7280;">Discover handpicked destinations that offer unforgettable experiences</p>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 2rem;">
+        <div class="destination-card">
+          <div style="position: relative; height: 200px; overflow: hidden;">
+            <img src="https://images.unsplash.com/photo-1736524972348-85c310d7815b?w=400&h=300&fit=crop" alt="Maldives" style="width: 100%; height: 100%; object-fit: cover;" />
+            <div style="position: absolute; top: 1rem; left: 1rem; background: #2563eb; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.875rem; font-weight: 500;">Beach</div>
+            <div style="position: absolute; top: 1rem; right: 1rem; background: rgba(255, 255, 255, 0.9); padding: 0.25rem 0.5rem; border-radius: 1rem; display: flex; align-items: center; gap: 0.25rem; font-size: 0.875rem;">
+              <i class="fas fa-star" style="color: #fbbf24;"></i> 4.9
+            </div>
+          </div>
+          <div style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; color: #6b7280; font-size: 0.875rem; margin-bottom: 0.5rem;">
+              <i class="fas fa-map-marker-alt"></i> Maldives
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 600; color: #111827; margin-bottom: 1rem;">Tropical Paradise Islands</h3>
+            <div style="display: flex; justify-content: space-between; color: #6b7280; font-size: 0.875rem; margin-bottom: 1rem;">
+              <span><i class="fas fa-clock"></i> 7 Days</span>
+              <span><i class="fas fa-users"></i> 124 reviews</span>
+            </div>
+            <div>
+              <span style="font-size: 1.5rem; font-weight: bold; color: #2563eb;">₹1,08,000</span>
+              <span style="color: #6b7280; font-size: 0.875rem;">/person</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 TourismPro. All rights reserved. | Crafted with ❤️ for travelers worldwide</p>
+    </div>
+  </footer>
+
+  <div id="bookingModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Complete Your Booking</h2>
+        <button class="close" onclick="closeBookingModal()">&times;</button>
+      </div>
+      <div class="booking-progress">
+        <div class="progress-step active" id="step1">1</div>
+        <div class="progress-label">Package</div>
+        <div class="progress-line" id="line1"></div>
+        <div class="progress-step" id="step2">2</div>
+        <div class="progress-label">Details</div>
+        <div class="progress-line" id="line2"></div>
+        <div class="progress-step" id="step3">3</div>
+        <div class="progress-label">Payment</div>
+      </div>
+      <div class="booking-step active" id="bookingStep1">
+        <h3>Select Your Package</h3>
+        <div class="form-group">
+          <label>Tour Package</label>
+          <div class="input-group">
+            <i class="fas fa-suitcase-rolling"></i>
+            <select id="modalPackageId" required><option value="" disabled selected>Choose a package...</option></select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Check-in Date</label>
+            <div class="input-group">
+              <i class="fas fa-calendar"></i>
+              <input type="date" id="modalCheckin" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Check-out Date</label>
+            <div class="input-group">
+              <i class="fas fa-calendar"></i>
+              <input type="date" id="modalCheckout" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Number of Guests</label>
+          <div class="input-group">
+            <i class="fas fa-users"></i>
+            <select id="modalGuests" required>
+              <option value="1">1 Guest</option>
+              <option value="2" selected>2 Guests</option>
+              <option value="3">3 Guests</option>
+              <option value="4">4 Guests</option>
+              <option value="5">5 Guests</option>
+              <option value="6">6 Guests</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="booking-step" id="bookingStep2">
+        <h3>Personal Information</h3>
+        <div class="trip-details-card">
+          <h4>Trip Summary</h4>
+          <div id="tripSummary"></div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <div class="input-group">
+              <i class="fas fa-user"></i>
+              <input type="text" id="firstName" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <div class="input-group">
+              <i class="fas fa-user"></i>
+              <input type="text" id="lastName" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email Address</label>
+            <div class="input-group">
+              <i class="fas fa-envelope"></i>
+              <input type="email" id="email" required />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Phone Number</label>
+            <div class="input-group">
+              <i class="fas fa-phone"></i>
+              <input type="tel" id="phone" required />
+            </div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Special Requests or Notes</label>
+          <textarea id="specialRequests" rows="3" placeholder="Any special requirements or requests..."></textarea>
+        </div>
+      </div>
+      <div class="booking-step" id="bookingStep3">
+        <h3>Payment & Confirmation</h3>
+        <div class="booking-summary">
+          <h4>Booking Summary</h4>
+          <div id="finalSummary"></div>
+        </div>
+        <div class="note-box">
+          <strong>Payment Information:</strong><br>
+          You will be redirected to our secure payment gateway to complete your booking. We accept all major credit cards, debit cards, and UPI payments.
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="termsAccepted" required />
+            I agree to the Terms and Conditions and Privacy Policy
+          </label>
+        </div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-prev" id="prevBtn" onclick="changeStep(-1)" style="display: none;">Previous</button>
+        <button class="btn-next" id="nextBtn" onclick="changeStep(1)">Next</button>
+        <button class="btn-submit" id="submitBtn" onclick="submitBooking()" style="display: none;">Complete Booking</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="messageBox" class="message-box" style="display: none;">
+    <h4>Booking Successful!</h4>
+    <p>Your booking has been confirmed. You will receive a confirmation email shortly with all the details.</p>
+    <button onclick="closeMessageBox()">Continue</button>
+  </div>
+
+  <script>
+    let currentStep = 1;
+    let bookingData = {};
+    let packagesData = [];
+
+    document.addEventListener('DOMContentLoaded', function() {
+      loadPackages();
+      setMinDate();
+    });
+
+    async function loadPackages() {
+      try {
+        const response = await fetch('http://localhost:9999/api/packages');
+        packagesData = await response.json();
+        
+        const heroSelect = document.getElementById('heroPackageId');
+        const modalSelect = document.getElementById('modalPackageId');
+        
+        heroSelect.innerHTML = '<option value="" disabled selected>Choose a package...</option>';
+        modalSelect.innerHTML = '<option value="" disabled selected>Choose a package...</option>';
+        
+        packagesData.forEach(pkg => {
+          const option1 = new Option(`${pkg.title} - ₹${pkg.price.toLocaleString()}`, pkg.id);
+          const option2 = new Option(`${pkg.title} - ₹${pkg.price.toLocaleString()}`, pkg.id);
+          option1.setAttribute('data-price', pkg.price);
+          option2.setAttribute('data-price', pkg.price);
+          heroSelect.add(option1);
+          modalSelect.add(option2);
+        });
+      } catch (error) {
+        console.error('Error loading packages:', error);
+        loadFallbackPackages();
+      }
+    }
+
+    function loadFallbackPackages() {
+      packagesData = [
+        { id: 1, title: 'Luxury Beach Resort Package', price: 208250 },
+        { id: 2, title: 'Adventure Mountain Expedition', price: 108249 },
+        { id: 3, title: 'Cultural Heritage Discovery', price: 74999 }
+      ];
+      
+      const heroSelect = document.getElementById('heroPackageId');
+      const modalSelect = document.getElementById('modalPackageId');
+      
+      heroSelect.innerHTML = '<option value="" disabled selected>Choose a package...</option>';
+      modalSelect.innerHTML = '<option value="" disabled selected>Choose a package...</option>';
+      
+      packagesData.forEach(pkg => {
+        const option1 = new Option(`${pkg.title} - ₹${pkg.price.toLocaleString()}`, pkg.id);
+        const option2 = new Option(`${pkg.title} - ₹${pkg.price.toLocaleString()}`, pkg.id);
+        option1.setAttribute('data-price', pkg.price);
+        option2.setAttribute('data-price', pkg.price);
+        heroSelect.add(option1);
+        modalSelect.add(option2);
+      });
+    }
+
+    function setMinDate() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById('heroCheckin').min = today;
+      document.getElementById('heroCheckout').min = today;
+      document.getElementById('modalCheckin').min = today;
+      document.getElementById('modalCheckout').min = today;
+    }
+
+    function handleHeroSubmit(event) {
+      event.preventDefault();
+      const packageId = document.getElementById('heroPackageId').value;
+      const checkin = document.getElementById('heroCheckin').value;
+      const checkout = document.getElementById('heroCheckout').value;
+      const guests = document.getElementById('heroGuests').value;
+      
+      if (!packageId || !checkin || !checkout) {
+        alert('Please fill in all required fields');
+        return;
+      }
+      
+      document.getElementById('modalPackageId').value = packageId;
+      document.getElementById('modalCheckin').value = checkin;
+      document.getElementById('modalCheckout').value = checkout;
+      document.getElementById('modalGuests').value = guests;
+      
+      openBookingModal();
+    }
+
+    function openBookingModal() {
+      document.getElementById('bookingModal').classList.add('active');
+      currentStep = 1;
+      updateStepDisplay();
+    }
+
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+      currentStep = 1;
+      updateStepDisplay();
+    }
+
+    function changeStep(direction) {
+      if (direction === 1) {
+        if (validateCurrentStep()) {
+          currentStep++;
+          updateStepDisplay();
+        }
+      } else {
+        currentStep--;
+        updateStepDisplay();
+      }
+    }
+
+    function validateCurrentStep() {
+      if (currentStep === 1) {
+        const packageId = document.getElementById('modalPackageId').value;
+        const checkin = document.getElementById('modalCheckin').value;
+        const checkout = document.getElementById('modalCheckout').value;
+        const guests = document.getElementById('modalGuests').value;
+        
+        if (!packageId || !checkin || !checkout || !guests) {
+          alert('Please fill in all required fields');
+          return false;
+        }
+        
+        if (new Date(checkout) <= new Date(checkin)) {
+          alert('Check-out date must be after check-in date');
+          return false;
+        }
+        
+        bookingData = { packageId, checkin, checkout, guests };
+        updateTripSummary();
+        
+      } else if (currentStep === 2) {
+        const firstName = document.getElementById('firstName').value;
+        const lastName = document.getElementById('lastName').value;
+        const email = document.getElementById('email').value;
+        const phone = document.getElementById('phone').value;
+        
+        if (!firstName || !lastName || !email || !phone) {
+          alert('Please fill in all required fields');
+          return false;
+        }
+        
+        if (!isValidEmail(email)) {
+          alert('Please enter a valid email address');
+          return false;
+        }
+        
+        bookingData.personalInfo = { firstName, lastName, email, phone, specialRequests: document.getElementById('specialRequests').value };
+        updateFinalSummary();
+        
+      } else if (currentStep === 3) {
+        const termsAccepted = document.getElementById('termsAccepted').checked;
+        if (!termsAccepted) {
+          alert('Please accept the terms and conditions');
+          return false;
+        }
+      }
+      
+      return true;
+    }
+
+    function updateStepDisplay() {
+      for (let i = 1; i <= 3; i++) {
+        const step = document.getElementById(`step${i}`);
+        const line = document.getElementById(`line${i}`);
+        
+        if (i < currentStep) {
+          step.classList.add('active');
+          if (line) line.classList.add('active');
+        } else if (i === currentStep) {
+          step.classList.add('active');
+        } else {
+          step.classList.remove('active');
+          if (line) line.classList.remove('active');
+        }
+      }
+      
+      for (let i = 1; i <= 3; i++) {
+        const stepContent = document.getElementById(`bookingStep${i}`);
+        stepContent.classList.toggle('active', i === currentStep);
+      }
+      
+      document.getElementById('prevBtn').style.display = currentStep > 1 ? 'block' : 'none';
+      document.getElementById('nextBtn').style.display = currentStep < 3 ? 'block' : 'none';
+      document.getElementById('submitBtn').style.display = currentStep === 3 ? 'block' : 'none';
+    }
+
+    function updateTripSummary() {
+      const packageSelect = document.getElementById('modalPackageId');
+      const selectedOption = packageSelect.options[packageSelect.selectedIndex];
+      const packageName = selectedOption ? selectedOption.text.split(' - ₹')[0] : 'Selected Package';
+      
+      const checkin = new Date(bookingData.checkin).toLocaleDateString();
+      const checkout = new Date(bookingData.checkout).toLocaleDateString();
+      const nights = Math.ceil((new Date(bookingData.checkout) - new Date(bookingData.checkin)) / (1000 * 60 * 60 * 24));
+      
+      document.getElementById('tripSummary').innerHTML = `
+        <div class="summary-item"><span>Package:</span><span>${packageName}</span></div>
+        <div class="summary-item"><span>Check-in:</span><span>${checkin}</span></div>
+        <div class="summary-item"><span>Check-out:</span><span>${checkout}</span></div>
+        <div class="summary-item"><span>Duration:</span><span>${nights} nights</span></div>
+        <div class="summary-item"><span>Guests:</span><span>${bookingData.guests}</span></div>
+      `;
+    }
+
+    function updateFinalSummary() {
+      const packageSelect = document.getElementById('modalPackageId');
+      const selectedOption = packageSelect.options[packageSelect.selectedIndex];
+      const packageName = selectedOption ? selectedOption.text.split(' - ₹')[0] : 'Selected Package';
+      const packagePrice = selectedOption ? parseInt(selectedOption.getAttribute('data-price')) : 0;
+      
+      const checkin = new Date(bookingData.checkin).toLocaleDateString();
+      const checkout = new Date(bookingData.checkout).toLocaleDateString();
+      const nights = Math.ceil((new Date(bookingData.checkout) - new Date(bookingData.checkin)) / (1000 * 60 * 60 * 24));
+      const totalPrice = packagePrice * parseInt(bookingData.guests);
+      
+      document.getElementById('finalSummary').innerHTML = `
+        <div class="summary-item"><span>Package:</span><span>${packageName}</span></div>
+        <div class="summary-item"><span>Check-in:</span><span>${checkin}</span></div>
+        <div class="summary-item"><span>Check-out:</span><span>${checkout}</span></div>
+        <div class="summary-item"><span>Duration:</span><span>${nights} nights</span></div>
+        <div class="summary-item"><span>Guests:</span><span>${bookingData.guests}</span></div>
+        <div class="summary-item"><span>Price per person:</span><span>₹${packagePrice.toLocaleString()}</span></div>
+        <div class="summary-item total"><span>Total Amount:</span><span>₹${totalPrice.toLocaleString()}</span></div>
+      `;
+    }
+
+    async function submitBooking() {
+      try {
+        const payload = {
+          firstName: bookingData.personalInfo.firstName,
+          lastName: bookingData.personalInfo.lastName,
+          email: bookingData.personalInfo.email,
+          phone: bookingData.personalInfo.phone,
+          checkinDate: bookingData.checkin,
+          checkoutDate: bookingData.checkout,
+          guests: parseInt(bookingData.guests),
+          packageId: parseInt(bookingData.packageId),
+          specialRequests: bookingData.personalInfo.specialRequests || ''
+        };
+        
+        const response = await fetch('http://localhost:9999/api/bookings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.json();
+        
+        document.getElementById('bookingModal').classList.remove('active');
+        document.getElementById('messageBox').style.display = 'block';
+        
+        currentStep = 1;
+        updateStepDisplay();
+        
+      } catch (error) {
+        console.error('Booking error:', error);
+        alert('There was an error processing your booking. Please try again.');
+      }
+    }
+
+    function closeMessageBox() {
+      document.getElementById('messageBox').style.display = 'none';
+    }
+
+    function isValidEmail(email) {
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    }
+
+    document.getElementById('bookingModal').addEventListener('click', function(e) {
+      if (e.target === this) closeBookingModal();
+    });
+  </script>
+</body>
+</html>
